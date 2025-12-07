@@ -1,0 +1,315 @@
+{
+	"info": {
+		"_postman_id": "49765280-e9377f7c-b5aa-48c4-bb6e-eae30deed49b",
+		"name": "Vyaguta QA Events",
+		"description": "Automated API tests for Vyaguta QA Core Events with dynamic token, payload, and ID handling.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "setupEvent",
+			"item": [
+				{
+					"name": "POST Create Event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fe5e0100-9775-4041-bf26-8c2c101b206a",
+								"exec": [
+									"/**onst responseBody = pm.response.json();",
+									"console.log('Rep Body', responseBody);",
+									"const message = responseBody.message;",
+									"console.log('Message', message);",
+									"// Test: Status code is 201",
+									"pm.test(\"Status code is 201\", function (){",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"// Get expected message from environment variable",
+									"const expectedMessage = pm.environment.get(\"expectedMessage\");",
+									"console.log('Expected Message', expectedMessage);",
+									"// Test expected message",
+									"pm.test(\"Message matches expected message\", function () {",
+									"    pm.expect(message).to.eql(expectedMessage);",
+									"});",
+									"// Test data id",
+									"const dataId = responseBody.data.id;",
+									"pm.test(\"Data id is a number\", function () {",
+									"    pm.expect(dataId).to.be.a('number');",
+									"});",
+									"// Save ID to environment variable",
+									"pm.environment.set(\"createdEventId\", dataId);",
+									"console.log(\"Saved createdEventId to environment:\", dataId);",
+									"// Test: Data ID exists and is not null",
+									"pm.test(\"Data ID is not null or undefined\", function () {",
+									"    pm.expect(dataId, \"ID should not be null or undefined\").to.not.be.oneOf([null, undefined]);",
+									"});**/",
+									"// -----------------------------",
+									"// ARRANGE",
+									"// -----------------------------",
+									"// Setup expected values and environment data before checking response",
+									"const expectedMessage = pm.environment.get(\"expectedMessage\");",
+									"const savedIdVarName = \"createdEventId\";",
+									"console.log(\"Expected Message (from env):\", expectedMessage);",
+									"",
+									"",
+									"// ACT",
+									"",
+									"// Parse the response (perform the action of reading response)",
+									"let responseBody;",
+									"try {",
+									"    responseBody = pm.response.json();",
+									"} catch (e) {",
+									"    // If response isn't JSON, fail early",
+									"    pm.test(\"Response should be valid JSON\", () => pm.expect.fail(\"Invalid JSON: \" + e.message));",
+									"    // Stop further checks by throwing (optional)",
+									"    throw e;",
+									"}",
+									"console.log(\"Resp Body\", responseBody);",
+									"",
+									"const status = pm.response.code;",
+									"const message = responseBody && responseBody.message;",
+									"const dataId = responseBody && responseBody.data && responseBody.data.id;",
+									"",
+									"console.log(\"Status:\", status);",
+									"console.log(\"Message:\", message);",
+									"console.log(\"Data ID:\", dataId);",
+									"",
+									"",
+									"// ASSERT",
+									"",
+									"// 1) Status code",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.expect(pm.response.code).to.eql(201);",
+									"});",
+									"",
+									"// 2) Message matches expected message",
+									"pm.test(\"Message matches expected message\", function () {",
+									"    // if expectedMessage is null/undefined, this will assert accordingly",
+									"    pm.expect(message).to.eql(expectedMessage);",
+									"});",
+									"",
+									"// 3) Data id is a number",
+									"pm.test(\"Data id is a number\", function () {",
+									"    pm.expect(dataId).to.be.a('number');",
+									"});",
+									"",
+									"// 4) Data ID exists (not null/undefined)",
+									"pm.test(\"Data ID is not null or undefined\", function () {",
+									"    pm.expect(dataId, \"ID should not be null or undefined\").to.not.be.oneOf([null, undefined]);",
+									"});",
+									"",
+									"// If all good, save the ID to environment (this is a side-effect after assertions)",
+									"if (typeof dataId !== \"undefined\" && dataId !== null) {",
+									"    pm.environment.set(savedIdVarName, dataId);",
+									"    console.log(\"Saved\", savedIdVarName, \"to environment:\", dataId);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "7e56342f-83d7-4bf1-b999-1ddfb4073a15",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "49765280-7eb2af72-51f5-4ed9-a72e-70840ea7e006",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"{{eventName}}\",\n  \"description\": \"{{eventDescription}}\",\n  \"link\": \"{{eventLink}}\",\n  \"eventDate\": \"{{eventDate}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/core/events",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"core",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Verify Event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9bf2d717-09be-41a3-9bdc-b6b0a4f14632",
+								"exec": [
+									"// Parse response JSON",
+									"const responseBody = pm.response.json();",
+									"console.log('Response Body:', responseBody);",
+									"const data = responseBody.data;",
+									"",
+									"// Test: Status code is 200",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Get expected values from environment",
+									"const expectedId = parseInt(pm.environment.get(\"createdEventId\")); // Saved from POST",
+									"const expectedName = pm.environment.get(\"eventName\");",
+									"const expectedDescription = pm.environment.get(\"eventDescription\");",
+									"const expectedLink = pm.environment.get(\"eventLink\");",
+									"const expectedDate = pm.environment.get(\"eventDate\");",
+									"",
+									"// Log expected values",
+									"console.log(\"Expected ID:\", expectedId);",
+									"console.log(\"Expected Name:\", expectedName);",
+									"console.log(\"Expected Description:\", expectedDescription);",
+									"console.log(\"Expected Link:\", expectedLink);",
+									"console.log(\"Expected Event Date:\", expectedDate);",
+									"",
+									"// Test: ID matches created event",
+									"pm.test(\"Event ID matches created ID\", function () {",
+									"    pm.expect(data.id).to.eql(expectedId);",
+									"});",
+									"",
+									"// Test: Name matches",
+									"pm.test(\"Event name matches expected\", function () {",
+									"    pm.expect(data.name).to.eql(expectedName);",
+									"});",
+									"",
+									"// Test: Description matches",
+									"pm.test(\"Event description matches expected\", function () {",
+									"    pm.expect(data.description).to.eql(expectedDescription);",
+									"});",
+									"",
+									"// Test: Link matches",
+									"pm.test(\"Event link matches expected\", function () {",
+									"    pm.expect(data.link).to.eql(expectedLink);",
+									"});",
+									"",
+									"// Test: Event date matches expected",
+									"pm.test(\"Event date matches expected\", function () {",
+									"    pm.expect(data.eventDate).to.eql(expectedDate);",
+									"});",
+									"",
+									"// SCHEMA VALIDATION (using Ajv)",
+									"const Ajv = require('ajv');",
+									"const ajv = new Ajv();",
+									"",
+									"// Define expected JSON schema",
+									"const schema = {",
+									"    type: \"object\",",
+									"    required: [\"data\"],",
+									"    properties: {",
+									"        data: {",
+									"            type: \"object\",",
+									"            required: [",
+									"                \"id\",",
+									"                \"name\",",
+									"                \"eventDate\",",
+									"                \"description\",",
+									"                \"link\",",
+									"                \"createdAt\",",
+									"                \"createdBy\",",
+									"                \"updatedAt\",",
+									"                \"updatedBy\"",
+									"            ],",
+									"            properties: {",
+									"                id: { type: \"integer\" },",
+									"                name: { type: \"string\" },",
+									"                eventDate: { type: \"string\" },",
+									"                description: { type: \"string\" },",
+									"                link: { type: \"string\" },",
+									"                createdAt: { type: \"string\" },",
+									"                createdBy: { type: \"integer\" },",
+									"                updatedAt: { type: \"string\" },",
+									"                updatedBy: { type: \"integer\" }",
+									"            }",
+									"        }",
+									"    }",
+									"};",
+									"",
+									"// Validate response against schema",
+									"const validate = ajv.compile(schema);",
+									"const valid = validate(responseBody);",
+									"",
+									"pm.test(\"Response matches expected schema\", function () {",
+									"    pm.expect(valid).to.be.true;",
+									"    if (!valid) {",
+									"        console.log(\"Schema validation errors:\", validate.errors);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "35da3944-980b-47db-9f03-64246c2f23d5",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "49765280-0676ec15-bcb8-4ea1-9b30-db943a0ae3f4",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/core/events/{{createdEventId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"core",
+								"events",
+								"{{createdEventId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "49765280-ac437b0d-ff1d-4ebe-9e89-45c977623218"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	}
+}
