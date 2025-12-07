@@ -1,0 +1,121 @@
+{
+	"info": {
+		"_postman_id": "49765280-316e24c3-49c0-4828-b187-e1eb3022059c",
+		"name": "REST API basics: CRUD, test & variable",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f2b22a3-d3d5-4a01-a865-d68589052361",
+						"exec": [
+							"const respeonseBody = pm.response.json()",
+							"console.log('Resp Body' , respeonseBody)",
+							"",
+							"const name = respeonseBody.name",
+							"console.log('name', name)",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"id": "49765280-624ef379-80de-4a00-9e1b-ee75ce3f046a",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://petstore.swagger.io/v2/pet/2",
+					"protocol": "https",
+					"host": [
+						"petstore",
+						"swagger",
+						"io"
+					],
+					"path": [
+						"v2",
+						"pet",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Data",
+			"id": "49765280-f00d0cfd-4423-422e-b66f-870cb56cc428",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://petstore.swagger.io/v2/pet/2\n",
+					"protocol": "https",
+					"host": [
+						"petstore",
+						"swagger",
+						"io"
+					],
+					"path": [
+						"v2",
+						"pet",
+						"2\n"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update data",
+			"id": "49765280-a89f9338-ea68-40ff-a9a1-7d6da9f4ca9b",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "https://petstore.swagger.io/v2/pet/2",
+					"protocol": "https",
+					"host": [
+						"petstore",
+						"swagger",
+						"io"
+					],
+					"path": [
+						"v2",
+						"pet",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete data",
+			"id": "49765280-82923815-9458-4732-a733-b212cb59b7e4",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "DELETE",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
