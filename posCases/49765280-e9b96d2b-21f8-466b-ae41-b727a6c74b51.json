@@ -1,0 +1,505 @@
+{
+	"info": {
+		"_postman_id": "49765280-e9b96d2b-21f8-466b-ae41-b727a6c74b51",
+		"name": "Vyaguta QA - Events - API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Events / POST Requests",
+			"item": [
+				{
+					"name": "Events / POST Requests / Negative",
+					"item": [
+						{
+							"name": "negativeCase-missingName",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "15a56327-ed7c-4737-8d06-aefcf5225093",
+										"exec": [
+											"//missing name\r",
+											"const resp = (() => {\r",
+											"    try { return pm.response.json(); }\r",
+											"    catch(e) { return {}; }\r",
+											"})();\r",
+											"\r",
+											"const body = (() => { try { return JSON.parse(pm.request.body.raw || \"{}\" ); } catch(e){ return {}; } })();\r",
+											"const ISO = /^\\d{4}-\\d{2}-\\d{2}$/;\r",
+											"\r",
+											"pm.test(\"Status 400 for missing name\", () => pm.expect(pm.response.code).to.equal(400));\r",
+											"pm.test(\"Error message mentions 'name'\", () => pm.expect((resp.message || \"\")).to.include(\"name\"));\r",
+											"pm.test(\"data is null\", () => pm.expect(resp.data).to.be.null);"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"id": "49765280-028b4afc-71a5-4dfb-b455-0baa691ca07a",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiNDAwIn0sImlhdCI6MTc0NTMxMDE0NTAzNn0.zSkgPGWfShPBszLD4E96tHOr50kA8ZMrmDDj2bmmLec",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "\n{\n    \"description\": \"description\",\n    \"link\": \"link\",\n    \"eventDate\": \"11-04-2025\"\n}\n\n\n"
+								},
+								"url": {
+									"raw": "https://qa.vyaguta.lftechnology.com.np/api/core/events",
+									"protocol": "https",
+									"host": [
+										"qa",
+										"vyaguta",
+										"lftechnology",
+										"com",
+										"np"
+									],
+									"path": [
+										"api",
+										"core",
+										"events"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "negativeCase_02",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "15a56327-ed7c-4737-8d06-aefcf5225093",
+										"exec": [
+											"pm.test(\"eventDate is non-ISO (negative case)\", () => {",
+											"  let json;",
+											"  try {",
+											"    json = pm.response.json();",
+											"  } catch (e) {",
+											"    pm.expect.fail(\"Response is not valid JSON\");",
+											"  }",
+											"",
+											"  // Try to find eventDate at the top level or in error.details",
+											"  let eventDate;",
+											"  if (json) {",
+											"    if (typeof json.eventDate !== 'undefined') {",
+											"      eventDate = json.eventDate;",
+											"    }",
+											"    if (typeof eventDate === 'undefined' && json.error && Array.isArray(json.error.details)) {",
+											"      for (const detail of json.error.details) {",
+											"        if (typeof detail.eventDate !== 'undefined') {",
+											"          eventDate = detail.eventDate;",
+											"          break;",
+											"        }",
+											"        // Some APIs put the field name under param or path",
+											"        if ((detail.param === 'eventDate' || detail.path === 'eventDate') && (detail.value || detail.message)) {",
+											"          eventDate = detail.value || detail.message;",
+											"          break;",
+											"        }",
+											"      }",
+											"    }",
+											"  }",
+											"",
+											"  if (typeof eventDate === 'undefined') {",
+											"    pm.expect.fail(\"'eventDate' property not found in response body or error details\");",
+											"  } else {",
+											"    const ISO = /^\\d{4}-\\d{2}-\\d{2}([T ][\\d:.+-Z]*)?$/;",
+											"    pm.expect(eventDate, \"eventDate exists\").to.exist;",
+											"    pm.expect(ISO.test(String(eventDate)), \"eventDate is not ISO\").to.equal(false);",
+											"  }",
+											"});",
+											"",
+											"pm.test(\"400 for invalid eventDate format\", () => {",
+											"  pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"pm.test(\"Error mentions date/format\", () => {",
+											"  let json;",
+											"  try {",
+											"    json = pm.response.json();",
+											"  } catch (e) {",
+											"    json = {};",
+											"  }",
+											"  const msg = (json.error && json.error.message) || json.message || \"\";",
+											"  pm.expect((msg || \"\").toLowerCase()).to.satisfy(m =>",
+											"    m.includes(\"eventdate\") || m.includes(\"date\") || m.includes(\"format\")",
+											"  );",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"id": "49765280-c6043d68-2565-45a5-9386-911132e4d0c5",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "\n{\n    \"name\":\"name\",\n    \"description\": \"description\",\n    \"link\": \"link\",\n    \"eventDate\": \"11-04-2025\"\n}\n\n\n"
+								},
+								"url": {
+									"raw": "https://qa.vyaguta.lftechnology.com.np/api/core/events",
+									"protocol": "https",
+									"host": [
+										"qa",
+										"vyaguta",
+										"lftechnology",
+										"com",
+										"np"
+									],
+									"path": [
+										"api",
+										"core",
+										"events"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "negativeCase_03",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "15a56327-ed7c-4737-8d06-aefcf5225093",
+										"exec": [
+											"// Keep existing status code test",
+											"pm.test(\"Status 401 Unauthorized\", () => pm.expect(pm.response.code).to.equal(401));",
+											"",
+											"// 1) Safely parse JSON body",
+											"let body = {};",
+											"try {",
+											"  body = pm.response.json();",
+											"} catch (e) {",
+											"  body = {};",
+											"}",
+											"",
+											"// Defensive access helpers",
+											"const err = body && typeof body === 'object' ? body.error || {} : {};",
+											"const msg = (err && typeof err.message === 'string') ? err.message : '';",
+											"const data = (err && Object.prototype.hasOwnProperty.call(err, 'data')) ? err.data : undefined;",
+											"",
+											"",
+											"// 3) data is null or empty string based on current 401 response",
+											"pm.test(\"error.data is null or empty string\", () => {",
+											"  pm.expect([null, \"\"]).to.include(data);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"id": "49765280-c06d84ea-3dbc-4730-b31f-9f5034484aeb",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "\n{\n    \"name\"=\"name\",\n    \"description\": \"description\",\n    \"link\": \"link\",\n    \"eventDate\": \"11-04-2025\"\n}\n\n\n"
+								},
+								"url": {
+									"raw": "https://qa.vyaguta.lftechnology.com.np/api/core/events",
+									"protocol": "https",
+									"host": [
+										"qa",
+										"vyaguta",
+										"lftechnology",
+										"com",
+										"np"
+									],
+									"path": [
+										"api",
+										"core",
+										"events"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "negativeCase_04",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "15a56327-ed7c-4737-8d06-aefcf5225093",
+										"exec": [
+											"//invalid name",
+											"const resp = (() => { ",
+											"    try { return pm.response.json(); } ",
+											"    catch(e) { return {}; } ",
+											"})();",
+											"",
+											"const body = (() => { ",
+											"    try { return JSON.parse(pm.request.body.raw || \"{}\"); } ",
+											"    catch(e){ return {}; } ",
+											"})();",
+											"",
+											"// Status 400 for invalid name type",
+											"pm.test(\"Status 400 for invalid name type\", () => {",
+											"    pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"// Response message mentions 'name'",
+											"pm.test(\"Error message mentions 'name'\", () => {",
+											"    pm.expect(resp.message || pm.response.text()).to.include(\"name\");",
+											"});",
+											"",
+											"// Optional: ensure data is null",
+											"pm.test(\"data is null\", () => {",
+											"    pm.expect(resp.data).to.be.null;",
+											"});",
+											"",
+											"// Optional: verify request name is not a string",
+											"pm.test(\"Request name is not a string\", () => {",
+											"    pm.expect(typeof body.name).to.not.equal(\"string\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"id": "49765280-e4d0d54f-650b-457d-a58d-42d3ef7b8592",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiNDAwIn0sImlhdCI6MTc0NTMxMDE0NTAzNn0.zSkgPGWfShPBszLD4E96tHOr50kA8ZMrmDDj2bmmLec",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "\n{\n    \"name\"=\"\",\n    \"description\": \"description\",\n    \"link\": \"link\",\n    \"eventDate\": \"2025-11-04\"\n}\n\n\n"
+								},
+								"url": {
+									"raw": "https://qa.vyaguta.lftechnology.com.np/api/core/events",
+									"protocol": "https",
+									"host": [
+										"qa",
+										"vyaguta",
+										"lftechnology",
+										"com",
+										"np"
+									],
+									"path": [
+										"api",
+										"core",
+										"events"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"id": "49765280-2f7b9de6-ee02-4ea4-8963-ebbd00e7597f"
+				},
+				{
+					"name": "Events / POST Requests / Positive",
+					"item": [
+						{
+							"name": "posCases",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3a421960-fd39-4e88-aa5f-5a7f186f92fa",
+										"exec": [
+											"// --- Parse response safely ---",
+											"let resp = {};",
+											"try {",
+											"    resp = pm.response.json();",
+											"} catch (e) {",
+											"    resp = {};",
+											"}",
+											"",
+											"// --- Extract actual response data safely ---",
+											"const message = (resp && typeof resp === 'object' ? resp.message : \"\") || \"\";",
+											"const data = (resp && typeof resp === 'object' ? resp.data : {}) || {};",
+											"",
+											"// --- Get expected message dynamically from environment ---",
+											"const expectedMessage = pm.environment.get(\"message\") || \"\";",
+											"",
+											"// --- Flexible message comparison: ignore trailing punctuation and case ---",
+											"function normalize(s) {",
+											"    return String(s).trim().toLowerCase().replace(/[.!?]+$/, \"\");",
+											"}",
+											"",
+											"pm.test(\"Message: (from environment)\", function () {",
+											"    pm.expect(normalize(message)).to.equal(normalize(expectedMessage));",
+											"});",
+											"",
+											"// --- Status code check ---",
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});",
+											"",
+											"// --- Validate data.id exists and is not null ---",
+											"pm.test(\"data.id exists and is not null\", function () {",
+											"    pm.expect(data).to.be.an(\"object\");",
+											"    pm.expect(data.id).to.exist;",
+											"    pm.expect(data.id).to.not.be.null;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"id": "49765280-260c5278-f0ea-4bcb-9220-512f7bcb0830",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiNDAwIn0sImlhdCI6MTc0NTMxMDE0NTAzNn0.zSkgPGWfShPBszLD4E96tHOr50kA8ZMrmDDj2bmmLec",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "\n{\n    \"name\": \"event name\",\n    \"description\": \"description\",\n    \"link\": \"link\",\n    \"eventDate\": \"2025-11-4\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://qa.vyaguta.lftechnology.com.np/api/core/events",
+									"protocol": "https",
+									"host": [
+										"qa",
+										"vyaguta",
+										"lftechnology",
+										"com",
+										"np"
+									],
+									"path": [
+										"api",
+										"core",
+										"events"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"id": "49765280-03597db0-5f15-4303-9e49-35bef98576b9",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8b826133-8795-4771-8107-0aa572cfdd73",
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "1bace479-5e36-4409-8f66-a8fa674b5aec",
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			],
+			"id": "49765280-51b0d333-be78-4935-a759-dfdcdc8138c2"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiNDAwIn0sImlhdCI6MTc0NTMxMDE0NTAzNn0.zSkgPGWfShPBszLD4E96tHOr50kA8ZMrmDDj2bmmLec\n\n\n\n\n\n\n",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "3184fc29-e769-4e72-99f1-661520de19cb",
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "34141918-ae5f-40bd-ae11-ae23e02f4256",
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
